@@ -1,0 +1,311 @@
+﻿<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <!--<link rel="stylesheet" type="text/css" href="css/index.css"/>-->
+    <!-- Include jQuery Mobile stylesheets -->
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <!-- Include the jQuery library -->
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- Include the jQuery Mobile library -->
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <script src="js/jquery.jsonp-2.4.0.min.js"></script>
+
+    <script src="js/jquery.blockUI.js"></script>
+
+    <script type="text/javascript">
+        $(document).ajaxStop($.unblockUI);
+
+        $(document).ready(function () {
+            $("#txtMobileNumber").val(localStorage.getItem('OwnerMob'));
+            $("#txtPassword").val('');
+            $("#txtUserName").val('');
+
+            $("#btnSaveSettings").click(function () {
+                $.blockUI();
+                
+                //alert("Run...");
+                $.ajax({
+                    type: "POST",
+                    url: "http://bluelight-001-site1.smarterasp.net/OwnerTask.asmx/AccControle",
+                    data: "{'UserName':'" + $("#txtUserName").val() + "','pws':'" + $("#txtPassword").val() + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    success: ajaxSaveSettingsAccessSucceed,
+                    dataType: "json",
+                    failure: ajaxSaveSettingsAccessFailed
+                });
+
+                //localStorage.setItem('OwnerMob', $("#txtMobileNumber").val());
+                //alert("Saved....");
+            });
+
+            function ajaxSaveSettingsAccessSucceed(response) {
+                var workList = eval('(' + response.d + ')');
+                for (var i = 0; i < workList.length; i++) {
+                    if (workList[i].acc == 'Granted') {
+                        localStorage.setItem('OwnerMob', $("#txtMobileNumber").val());
+                        alert("Saved....");
+                    } else {
+                        alert("Access denied you can’t change the settings!");
+                    }
+                }
+            }
+
+            function ajaxSaveSettingsAccessFailed(error) {
+                //$('#divLoading').hide();
+                alert('error: ' + error);
+                //$('#divResults').hide();
+            }
+
+            function pareseResult(workList) {
+                var lists = '';
+                $("#tblPendingwork tbody").find("tr").remove();
+                var worktable = $("#tblPendingwork tbody");
+
+                for (var i = 0; i < workList.length; i++) {
+                    if (lists == '') {
+
+                        if (workList[i].tflag == 'F') {
+                            lists = '<tr style="color:red"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                        if (workList[i].tflag == 'D') {
+                            lists = '<tr style="color:navy"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                        if (workList[i].tflag == 'P') {
+                            lists = '<tr ><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                    }
+                    else {
+                        if (workList[i].tflag == 'F') {
+                            lists = lists + '<tr style="color:red"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button" value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                        if (workList[i].tflag == 'D') {
+                            lists = lists + '<tr style="color:navy"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                        if (workList[i].tflag == 'P') {
+                            lists = lists + '<tr ><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                        }
+                    }
+                }
+                worktable.append(lists);
+                $("#tblPendingwork").table("refresh");
+                //$('#divResults').html(lists);
+                //$('#divResults').show();
+            }
+
+            function ajaxCallSucceed(response) {
+                //alert("Succeed...");
+                //$('#divLoading').hide();
+                var workList = eval('(' + response.d + ')');
+                pareseResult(workList);
+            }
+
+            function ajaxCallFailed(error) {
+                //$('#divLoading').hide();
+                alert('error: ' + error);
+                //$('#divResults').hide();
+            }
+
+            try {
+                $("#btnRefreshPendingwork").click(function () {
+                    $.blockUI();
+                    //alert("Run...");
+                    $.ajax({
+                        type: "POST",
+                        url: "http://bluelight-001-site1.smarterasp.net/OwnerTask.asmx/DueEventsUserMobileJson",
+                        data: "{'userMobileNumber':'" + localStorage.getItem('OwnerMob') + "'}",
+                        contentType: "application/json; charset=utf-8",
+                        success: ajaxCallSucceed,
+                        dataType: "json",
+                        failure: ajaxCallFailed
+                    });
+                });
+            }
+            catch (e) {
+                alert('failed to call web service. Error: ' + e);
+            }
+
+            //$("#btnRefreshPendingwork").click(function () {
+            //    alert("Run...");
+            //    $.ajax({
+            //        crossDomain: true,
+            //        //type: "POST",
+            //        url: "http://bluelight-001-site1.smarterasp.net/OwnerTask.asmx/DueEventsUserMobileJson",
+            //        data: {userMobileNumber:'0773567521'},
+            //        contentType: "application/json; charset=utf-8",
+            //        dataType: "jsonp",
+            //        success: ajaxCallSucceed,
+            //        failure: ajaxCallFailed
+            //    });
+            //});
+
+
+
+        });
+
+        function compleatButtonClick(tid, tUser) {
+            //alert('Test Button');
+            //alert(tid + '  -  ' + tUser);
+            $.blockUI();
+
+            $.ajax({
+                type: "POST",
+                url: "http://bluelight-001-site1.smarterasp.net/OwnerTask.asmx/Update_EventSO_Complete_ByID",
+                data: "{'_ID':'" + tid + "','_Completed_User':'" + tUser + "','userMobileNumber':'" + localStorage.getItem('OwnerMob') + "'}",
+                contentType: "application/json; charset=utf-8",
+                success: ajaxCallSucceed,
+                dataType: "json",
+                failure: ajaxCallFailed
+            });
+        };
+
+        function pareseResult(workList) {
+            var lists = '';
+            $("#tblPendingwork tbody").find("tr").remove();
+            var worktable = $("#tblPendingwork tbody");
+
+            for (var i = 0; i < workList.length; i++) {
+                if (lists == '') {
+
+                    if (workList[i].tflag == 'F') {
+                        lists = '<tr style="color:red"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                    if (workList[i].tflag == 'D') {
+                        lists = '<tr style="color:navy"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                    if (workList[i].tflag == 'P') {
+                        lists = '<tr ><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                }
+                else {
+                    if (workList[i].tflag == 'F') {
+                        lists = lists + '<tr style="color:red"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button" value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                    if (workList[i].tflag == 'D') {
+                        lists = lists + '<tr style="color:navy"><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                    if (workList[i].tflag == 'P') {
+                        lists = lists + '<tr ><td>' + workList[i].tId + '</dt> <td >' + workList[i].Style + ' </td> <td >' + workList[i].Module + ' </td> <td >' + workList[i].EventName + ' </td> <td >' + workList[i].DueDateTime + ' </td> <td> <input type="button"  value="Complete" onclick="compleatButtonClick(' + workList[i].tId + ',' + localStorage.getItem('OwnerMob') + ')"  id="' + workList[i].tId + '"> </td></tr>';
+                    }
+                }
+            }
+            worktable.append(lists);
+            $("#tblPendingwork").table("refresh");
+            //$('#divResults').html(lists);
+            //$('#divResults').show();
+        }
+
+        function ajaxCallSucceed(response) {
+            //alert("Succeed...");
+            //$('#divLoading').hide();
+            var workList = eval('(' + response.d + ')');
+            pareseResult(workList);
+        }
+
+        function ajaxCallFailed(error) {
+            //$('#divLoading').hide();
+            alert('error: ' + error);
+            //$('#divResults').hide();
+        }
+
+
+    </script>
+
+    <title>DAY15</title>
+
+</head>
+<body>
+    <div data-role="page" id="PageOne">
+        <div data-role="header" data-position="fixed">
+            <a href="#SettingsPage" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings</a>
+            <h1>DAY15</h1>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#PagePendingWork" data-icon="calendar" id="btnPendingwork">Pending Work</a></li>
+                    <li><a href="#" data-icon="bullets">Style Status</a></li>
+                    <li><a href="#" data-icon="user">My Performance</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div data-role="page" id="PagePendingWork">
+        <div data-role="header" data-position="fixed">
+            <a href="#SettingsPage" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings</a>
+            <h1>DAY15</h1>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#PagePendingWork" data-icon="calendar">Pending Work</a></li>
+                    <li><a href="#" data-icon="bullets">Style Status</a></li>
+                    <li><a href="#" data-icon="user">My Performance</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <div data-role="main" class="ui-content">
+            <input type="button" value="Load Pending Jobs" id="btnRefreshPendingwork">
+            <!--<input type="button" value="Test button" onclick="compleatButtonClick('1','Anu')" id="testbtn">-->
+            <table data-role="table" data-mode="columntoggle" class="ui-responsive" id="tblPendingwork">
+                <thead>
+                    <tr >
+                        <th>REF ID</th>
+                        <th data-priority="1">Style</th>
+                        <th data-priority="2">Module</th>
+                        <th data-priority="3">Event</th>
+                        <th data-priority="4">Due Date</th>
+                        <!--<th data-priority="5">Completed Date</th>-->
+                        <th>...</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div data-role="page" data-dialog="true" id="SettingsPage">
+        <div data-role="header">
+            <h1>Settings</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <input type="text" data-clear-btn="true" name="User Name" autocomplete="off" id="txtUserName" placeholder="User Name" value="">
+            <input type="password" data-clear-btn="true" name="Password" autocomplete="off" id="txtPassword" placeholder="Password" value="">
+
+            <input type="text" name="Mobile Number" id="txtMobileNumber" placeholder="Mobile Number">
+            <input type="button" value="Save" id="btnSaveSettings">
+        </div>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+</html>
