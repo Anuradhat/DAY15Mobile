@@ -38,6 +38,8 @@
 
     <script src="js/jquery.blockUI.js"></script>
 
+    <script src="js/Page.Function.js"></script>
+
     <script type="text/javascript">
         $(document).ajaxStop($.unblockUI);
 
@@ -48,7 +50,7 @@
 
             $("#btnSaveSettings").click(function () {
                 $.blockUI();
-                
+
                 //alert("Run...");
                 $.ajax({
                     type: "POST",
@@ -164,7 +166,7 @@
             //    });
             //});
 
-
+            
 
         });
 
@@ -247,7 +249,7 @@
             <div data-role="navbar">
                 <ul>
                     <li><a href="#PagePendingWork" data-icon="calendar" id="btnPendingwork">Pending Work</a></li>
-                    <li><a href="#" data-icon="bullets">Style Status</a></li>
+                    <li><a href="StyleStatus.html" data-icon="bullets">Style Status</a></li>
                     <li><a href="#" data-icon="user">My Performance</a></li>
                 </ul>
             </div>
@@ -262,7 +264,7 @@
             <div data-role="navbar">
                 <ul>
                     <li><a href="#PagePendingWork" data-icon="calendar">Pending Work</a></li>
-                    <li><a href="#" data-icon="bullets">Style Status</a></li>
+                    <li><a href="StyleStatus.html" data-icon="bullets">Style Status</a></li>
                     <li><a href="#" data-icon="user">My Performance</a></li>
                 </ul>
             </div>
@@ -273,7 +275,7 @@
             <!--<input type="button" value="Test button" onclick="compleatButtonClick('1','Anu')" id="testbtn">-->
             <table data-role="table" data-mode="columntoggle" class="ui-responsive" id="tblPendingwork">
                 <thead>
-                    <tr >
+                    <tr>
                         <th>REF ID</th>
                         <th data-priority="1">Style</th>
                         <th data-priority="2">Module</th>
@@ -288,6 +290,39 @@
 
         </div>
     </div>
+
+    <!--<div data-role="page" id="PageStyleStatus">
+        <div data-role="header" data-position="fixed">
+            <a href="#SettingsPage" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings</a>
+            <h1>DAY15</h1>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#PagePendingWork" data-icon="calendar">Pending Work</a></li>
+                    <li><a href="#PageStyleStatus" data-icon="bullets">Style Status</a></li>
+                    <li><a href="#" data-icon="user">My Performance</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <div data-role="main" class="ui-content">
+            <div class="ui-grid-b ui-responsive">
+                <div class="ui-block-a">
+                    <input type="text" data-clear-btn="true" name="Style" autocomplete="on" id="txtStyle" placeholder="Enter Style" value="">
+                </div>
+                <div class="ui-block-b">
+                    <select>
+                        <option value="Test1">Test 1</option>
+                        <option value="Test2">Test 2</option>
+                    </select>
+                </div>
+                <div class="ui-block-c">
+                    <input type="button" value="Style Status" id="btnRefreshStyleStatus">
+                </div>
+            </div>
+
+
+        </div>
+    </div>-->
 
     <div data-role="page" data-dialog="true" id="SettingsPage">
         <div data-role="header">
